@@ -1,0 +1,13 @@
+PiPLa0201. Sastādīt C++ programmu, kas noskaidro, vai dotajā skaitļu virknē ir sastopams lietotāja dots skaitlis.
+Skaitļu virkne jārealizē divos veidos, izmantojot STL::list konteineru un izmantojot STL::vector konteineru.
+
+PiPLa0202. Sastādīt C++ programmu, kas izdzēš no dotās skaitļu virknes lietotāja dotu skaitli visās tā vietās.
+Skaitļu virkne jārealizē divos veidos, izmantojot STL::list konteineru un izmantojot STL::vector konteineru.
+
+PiPLa0203. Sastādīt C++ programmu, kas iesprauž dotajā skaitļu virknē lietotāja dotu skaitli kā n-to elementu. Lietotājs ievada gan skaitli, gan kārtas numuru n (n>=1).
+Skaitļu virkne jārealizē divos veidos, izmantojot STL::list konteineru un izmantojot STL::vector konteineru.
+
+PiPLa02_papildus. Sastādīt C++ programmu, kas noskaidro, vai dotajā skaitļu virknē ir sastopams lietotāja dots skaitlis.
+Skaitļu virkne jārealizē divos veidos, izmantojot STL::list konteineru un izmantojot STL::vector konteineru.
+Risinājumam sastādīt un izmantot meklēšanas funkciju veidni, kas pielāgojas gan konteinera tipam, gan elementa tipam.
+
