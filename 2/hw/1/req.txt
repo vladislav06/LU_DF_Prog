@@ -1,0 +1,3 @@
+Izveidot programmu valodā C++, kas apstrādā teksta failu secīgā režīmā. Dati no faila jānolasa pa vienai rindiņai. Nedrīkst dublēt visa faila saturu operatīvajā atmiņā. Sīkākas prasības sk. Laboratorijas darbu noteikumos.
+
+F17. Dots netukšs teksta fails. Uzrakstīt procedūru, kura izveido failu, kurā katras dotā faila rindas sākumā ir pierakstīts tās numurs (tam paredzēt 4 simbolus rindas sākumā). Saskaitīt simbolu, vārdu un rindiņu skaitu failā. Par vārdu uzskatīt patvaļīgu simbolu virkni, kas atdalīta ar tukšumiem vai pieturas zīmēm (punkts, komats, apaļās iekavas, izsaukuma zīme, jautājuma zīme).
