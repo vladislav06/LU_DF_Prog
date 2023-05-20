@@ -27,6 +27,7 @@ using namespace std;
 template<typename T>
 void print(list<T> &list);
 
+/// secondGreatestToEnd(list)
 /// funkcija kas atrod list
 /// otro lielāko elementu,
 /// ja tāds eksistē un pārvieto to uz saraksta beigām.
@@ -36,7 +37,7 @@ void secondGreatestToEnd(list<T> &list);
 
 int main() {
 
-    list<int> l = {1, 2, 3, 4};
+    list<int> l = {3,1,2,4};
     //  [4,2,1,-1,-2,3]
 
     print(l);
@@ -75,6 +76,12 @@ void secondGreatestToEnd(list<T> &arr) {
             secLarg = it;
         }
     }
+
+    if(*secLarg == *larg){
+        cout << "second largest does not exist\n";
+        return;
+    }
+
     cout << "second largest: " << *secLarg << endl;
 
     //move secLargest to the end

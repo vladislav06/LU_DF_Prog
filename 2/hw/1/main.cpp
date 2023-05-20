@@ -124,7 +124,9 @@ qqqq q q, q, q            Vārdu skaits:   12                             Vārdu
 
 
 a,f,tert,e3456%           Simbolu skaits: 45                             Simbolu skaits: 44
-qe"qe[qe{qe]qe}           Vārdu skaits:   12                             Vārdu skaits:   12
+qe"qe[qe{qe]qe}           Vārdu skaits:   14                             Vārdu skaits:   14
 qe,qe.qe/qe;qe'           Rindiņu skaits: 3                              Rindiņu skaits: 3
+
+  nav faila               Nav faila!                                     Nav faila!
 
 *************************************************************/

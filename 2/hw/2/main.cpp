@@ -75,6 +75,8 @@ template<typename T>
 void removeAll(Node<T> **head);
 
 //task
+
+/// secondGreatestToEnd(list)
 /// funkcija kas atrod vienvirziena saistīto saraksta
 /// otro lielāko elementu,
 /// ja tāds eksistē un pārvieto to uz saraksta beigām.
@@ -88,34 +90,11 @@ int main() {
 
     // []->[]->[][][][][]
     Node<int> **head = new Node<int> *;
-//
-//
-//    int in[4] = {1, 2, 3, 4};
-//    int out[4] = {1, 2, 4, 3};
-//
-//    for (int i: in) {
-//        addToEnd(head, i);
-//    }
-//
-//    print(head);
-//    secondGreatestToEnd(head);
-//    print(head);
-//
-//    Node<int> *tmp = (*head);
-//    for (int i = 0; i < 4; i++) {
-//        if (out[i] != tmp->val) {
-//            cout << "error!\n";
-//            break;
-//        }
-//        tmp = tmp->next;
-//    }
-//
-//    removeAll(head);
 
     int n;
-    for (int i = 0; i < 3; i++) {
-        cin>>n;
-        addToEnd(head,n);
+    for (int i = 0; i < 4; i++) {
+        cin >> n;
+        addToEnd(head, n);
     }
     print(head);
     secondGreatestToEnd(head);
@@ -131,6 +110,10 @@ void secondGreatestToEnd(Node<T> **head) {
 
     //find largest elements
     Node<T> *tmp = (*head);
+    if (tmp == nullptr) {
+        cout << "list is empty\n";
+        return;
+    }
     Node<T> *largest = (*head);
     while (tmp != nullptr) {
         if (tmp->val > largest->val) {
@@ -138,16 +121,20 @@ void secondGreatestToEnd(Node<T> **head) {
         }
         tmp = tmp->next;
     }
+
     cout << "largest: " << largest->val << endl;
 
     //find second largest elements
     tmp = (*head);
     Node<T> *secLargest = (*head);
 
-    //check if first element is largest
-    if ((*head) == largest) {
-        secLargest = (*head)->next;
+    if ((*head)->next != nullptr) {
+        //check if first element is largest
+        if ((*head) == largest) {
+            secLargest = (*head)->next;
+        }
     }
+
 
     while (tmp != nullptr) {
         if (tmp->val > secLargest->val && tmp->val < largest->val) {
@@ -155,6 +142,13 @@ void secondGreatestToEnd(Node<T> **head) {
         }
         tmp = tmp->next;
     }
+
+
+    if (largest->val == secLargest->val) {
+        cout << "second largest does not exist\n";
+        return;
+    }
+
     cout << "second largest: " << secLargest->val << endl;
 
     //move secLargest to the end
@@ -218,6 +212,12 @@ void addAfter(Node<T> **head, T newVal) {
 template<typename T>
 void print(Node<T> **head) {
     Node<T> *start = (*head);
+
+    if (start == nullptr) {
+        cout << "[]";
+        return;
+    }
+
     cout << "[";
     while (start->next != nullptr) {
         cout << start->val << ", ";
@@ -260,10 +260,13 @@ void removeNext(Node<T> **head) {
 
 template<typename T>
 void removeAll(Node<T> **head) {
+    if ((*head) == nullptr) {
+        return;
+    }
     while ((*head)->next != nullptr) {
         removeNext(head);
     }
-    delete head;
+    delete *head;
 }
 
 
