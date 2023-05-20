@@ -6,7 +6,7 @@
 using namespace std;
 
 
-vector<string> cities;
+vector<char*> cities;
 
 int main() {
 
