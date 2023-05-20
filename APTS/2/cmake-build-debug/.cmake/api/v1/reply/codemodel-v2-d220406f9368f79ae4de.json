@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/home/vm/Documents/lu/LU_DF_Prog/APTS/2/cmake-build-debug",
-		"source" : "/home/vm/Documents/lu/LU_DF_Prog/APTS/2"
+		"build" : "/home/vm/Documents/lu/AuP/LU_DF_Prog/APTS/2/cmake-build-debug",
+		"source" : "/home/vm/Documents/lu/AuP/LU_DF_Prog/APTS/2"
 	},
 	"version" : 
 	{
