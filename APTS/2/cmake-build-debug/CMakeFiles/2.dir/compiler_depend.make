@@ -184,11 +184,8 @@ CMakeFiles/2.dir/main.cpp.o: /home/vm/Documents/lu/AuP/LU_DF_Prog/APTS/2/main.cp
   /usr/include/c++/12.2.1/bits/codecvt.h \
   /usr/include/c++/12.2.1/x86_64-pc-linux-gnu/bits/basic_file.h \
   /usr/include/c++/12.2.1/x86_64-pc-linux-gnu/bits/c++io.h \
-  /usr/include/c++/12.2.1/bits/fstream.tcc \
-  /usr/include/c++/12.2.1/iostream
+  /usr/include/c++/12.2.1/bits/fstream.tcc
 
-
-/usr/include/c++/12.2.1/iostream:
 
 /usr/include/c++/12.2.1/bits/fstream.tcc:
 

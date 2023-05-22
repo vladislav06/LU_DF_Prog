@@ -1,12 +1,50 @@
 //
-// Created by Vladislavs Agarkovs on 23.20.5.
+// Created by Vladislavs Agarkovs on 20.05.2023.
 //
-// apts 2
-// This algo will use binary tree traversing to get ordered list of players and their trust levels
-//
-//
+// APTS 2
+
+/*
+ * brief algo:
+ * open file
+ * parse two arrays:
+ *      array with players/ vertices(id)
+ *      array with who invited who/ paths (from id, to id)
+ * combine two arrays to create tree:
+ *      get one path, find two vertices, set child address in parent vertex
+ * find root(vertex whose address isn't assigned to any other vertex)
+ *
+ * go through each node in the tree and add it id to stack at node depth position in the array:
+ *    1
+ *   /  \
+ *  /    \
+ *  2    3
+ * / \  / \
+ * 4 5 6  7
+ *
+ *  [0] [1] [2]
+ *   1   2   4
+ *       3   5
+ *           6
+ *           7
+ *
+ * then just save to file
+ *
+ *  2: 4 5 6 7
+ *  1: 2 3
+ *  0: 1
+ *
+ */
+
+
 #include <fstream>
+
+
+//#define DEBUG
+
+#ifdef  DEBUG
 #include <iostream>
+#endif
+
 using namespace std;
 
 template<typename T>
@@ -102,8 +140,6 @@ struct Node {
     int id = 0;
 };
 
-Node *find(Node *root, int id);
-
 Node *read(fstream &fin);
 
 void write(ostream &fout, Node *root);
@@ -118,53 +154,115 @@ int main() {
 
     //write
     ofstream fout("team.out", ios::out);
+#ifdef  DEBUG
+    write(cout, root);
+#else
     write(fout, root);
-
+#endif
     return 0;
 }
 
+/**
+ * open file.\n
+ * parse two arrays:\n
+ *    *  array with players/ vertices(id)\n
+ *    *  array with who invited who/ paths (from id, to id)\n
+ * combine two arrays to create tree:\n
+ *    *  get one path, find two vertices, set child address in parent vertex\n
+ * find root(vertex whose address isn't assigned to any other vertex)\n
+ */
 Node *read(fstream &fin) {
-    //read in to binary tree
-
     //Participant Woman Man
 
-    //first node fill
-    Node *root = new Node();
-    fin >> root->id;
+    //create arrays
+    Vector<Node *> nodes;
+    int nodeCount = 0;
 
-    Node *woman = new Node();
-    fin >> woman->id;
-    root->woman = woman;
+    struct Pair {
+        int parent;
+        int child;
+        bool man;
+    };
 
-    Node *man = new Node();
-    fin >> man->id;
-    root->man = man;
+    Vector<Pair *> pairs;
+    int pairCount = 0;
 
 
+
+
+    //fill them
     while (fin) {
-        int id;
-        fin >> id;
+        //get one parent node
+        Node *node = new Node();
+        fin >> node->id;
+        nodes[nodeCount] = node;
+        nodeCount++;
 
-        //skip line
-        if (id == 0) {
-            fin >> id >> id;
-            continue;
+        //get two connections to child nodes,first will be woman, and second will be man
+        int childId;
+        fin >> childId;
+        if (childId != 0) {
+            Pair *pair = new Pair();
+            pair->parent = node->id;
+            pair->child = childId;
+            pair->man = false;
+            pairs[pairCount] = pair;
+            pairCount++;
         }
-        //find
-        Node *res = find(root, id);
 
-        if (res == nullptr) {
-            continue;
+        fin >> childId;
+        if (childId != 0) {
+            Pair *pair = new Pair();
+            pair->parent = node->id;
+            pair->child = childId;
+            pair->man = true;
+            pairs[pairCount] = pair;
+            pairCount++;
         }
-        woman = new Node();
-        fin >> woman->id;
-        res->woman = woman;
-
-        man = new Node();
-        fin >> man->id;
-        res->man = man;
     }
-    return root;
+
+    //create tree
+    for (int i = 0; i < pairCount; i++) {
+        Pair *pair = pairs[i];
+        //find parent and child
+        Node *parent;
+        Node *child;
+
+        for (int j = 0; j < nodeCount; j++) {
+            Node *node = nodes[j];
+            if (node->id == pair->parent) {
+                parent = node;
+            } else if (node->id == pair->child) {
+                child = node;
+            }
+        }
+        if (pair->man) {
+            parent->man = child;
+        } else {
+            parent->woman = child;
+        }
+    }
+
+    //find root
+    // if node isn't child for any other node, then it is the root
+
+    for (int i = 0; i < nodeCount; i++) {
+        Node *node = nodes[i];
+        bool hasNoParents = true;
+
+        for (int j = 0; j < pairCount; ++j) {
+            Pair *pair = pairs[j];
+            if (pair->child == node->id)
+                hasNoParents = false;
+        }
+
+        if (hasNoParents) {
+            return node;
+        }
+    }
+    return nullptr;
+
+    //   return root;
 }
 
 
@@ -182,13 +280,13 @@ void write(ostream &fout, Node *root) {
 
 
     // -3 cuz end elements
-    int depth = fillVectorStack(layers, root, 1) - 3;
+    int depth = fillVectorStack(layers, root, 1) - 2;
 
     //fill file
     for (int i = depth; i >= 0; i--) {
         fout << i << ":";
         for (int id = layers[i].pop(); id != -1; id = layers[i].pop()) {
-            if(id ==0)
+            if (id == 0)
                 continue;
             fout << " " << id;
         }
@@ -216,21 +314,4 @@ int fillVectorStack(Vector<Stack<int>> &layers, Node *root, int depth) {
     }
     return res1 > res2 ? res1 : res2;
 
-}
-
-
-Node *find(Node *root, int id) {
-    if (root == nullptr) {
-        return nullptr;
-    }
-
-    if (root->id == id) {
-        return root;
-    } else {
-        Node *found = find(root->woman, id);
-        if (found == nullptr) {
-            found = find(root->man, id);
-        }
-        return found;
-    }
 }
