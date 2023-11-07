@@ -8,28 +8,29 @@ import isbnlib
 app = QApplication([])
 # Global book dict
 books = {
-    "978-7-5035-3452-2": {"title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "isbn": "9781234567891",
-                          "price": 12.0, "stock": 5},
-    "978-6-0918-1145-9": {"title": "To Kill a Mockingbird", "author": "Harper Lee", "isbn": "9781234567892",
-                          "price": 15.0, "stock": 3},
-    "978-8-3023-0402-6": {"title": "1984", "author": "George Orwell", "isbn": "9781234567893", "price": 9.99,
-                          "stock": 10},
-    "978-7-3756-6440-2": {"title": "The Catcher in the Rye", "author": "J.D. Salinger", "isbn": "9781234567894",
-                          "price": 20.5, "stock": 2},
-    "978-0-8462-4207-9": {"title": "Pride and Prejudice", "author": "Jane Austen", "isbn": "9781234567895",
-                          "price": 8.5, "stock": 7},
-    "978-0-2050-7751-9": {"title": "The Hobbit", "author": "J.R.R. Tolkien", "isbn": "9781234567896", "price": 14.99,
-                          "stock": 6},
-    "978-7-6359-8148-5": {"title": "Harry Potter and the Sorcerer's Stone", "author": "J.K. Rowling",
-                          "isbn": "9781234567897", "price": 10.0, "stock": 1},
-    "978-3-0297-3233-6": {"title": "The Lord of the Rings", "author": "J.R.R. Tolkien", "isbn": "9781234567898",
-                          "price": 7.5, "stock": 4},
-    "978-5-8552-9325-8": {"title": "To the Lighthouse", "author": "Virginia Woolf", "isbn": "9781234567899",
-                          "price": 11.99, "stock": 8},
-    "978-7-5708-0459-7": {"title": "The Shining", "author": "Stephen King", "isbn": "9781234567800", "price": 18.0,
-                          "stock": 9}
+    "9787503534522": {"title": "The Great Gatsby", "author": "F. Scott Fitzgerald", "isbn": "9787503534522",
+                      "price": 12.0, "stock": 5},
+    "9786091811459": {"title": "To Kill a Mockingbird", "author": "Harper Lee", "isbn": "9786091811459",
+                      "price": 15.0, "stock": 3},
+    "9788302304026": {"title": "1984", "author": "George Orwell", "isbn": "9788302304026", "price": 9.99,
+                      "stock": 10},
+    "9787375664402": {"title": "The Catcher in the Rye", "author": "J.D. Salinger", "isbn": "9787375664402",
+                      "price": 20.5, "stock": 2},
+    "9780846242079": {"title": "Pride and Prejudice", "author": "Jane Austen", "isbn": "9780846242079",
+                      "price": 8.5, "stock": 7},
+    "9780205077519": {"title": "The Hobbit", "author": "J.R.R. Tolkien", "isbn": "9780205077519", "price": 14.99,
+                      "stock": 6},
+    "9787635981485": {"title": "Harry Potter and the Sorcerer's Stone", "author": "J.K. Rowling",
+                      "isbn": "9787635981485", "price": 10.0, "stock": 1},
+    "9783029732336": {"title": "The Lord of the Rings", "author": "J.R.R. Tolkien", "isbn": "9783029732336",
+                      "price": 7.5, "stock": 4},
+    "9785855293258": {"title": "To the Lighthouse", "author": "Virginia Woolf", "isbn": "9785855293258",
+                      "price": 11.99, "stock": 8},
+    "9787570804597": {"title": "The Shining", "author": "Stephen King", "isbn": "9787570804597", "price": 18.0,
+                      "stock": 9}
 
 }
+books_to_show = books
 
 
 # Functions for work with books dictionary
@@ -49,12 +50,19 @@ def remove_book(isbn):
         show_error("ISBN nebija atrasts!")
 
 
-def find_book(isbn):
-    if isbn in books:
-        return books[isbn]
-    else:
-        show_error("ISBN nebija atrasts!")
-        return None
+def find_book_isbn(isb):
+    books_to_show.clear()
+    for isbn in books:
+        if isbn.find(isb):
+            books_to_show[isbn] = books[isbn]
+
+
+def find_book_name(name):
+    books_to_show.clear()
+    for isbn in books:
+        book = books[isbn]
+        if book["title"].find(name) or book["author"].find(name):
+            books_to_show[isbn] = book
 
 
 def print_book(book):
@@ -227,14 +235,22 @@ class Window(QWidget):
                 self.isbn = QLabel(book["isbn"])
                 self.price = QLabel(str(book["price"]))
                 self.stock = QLabel(str(book["stock"]))
+                self.delete = QPushButton("Nodzēst")
+                self.delete.clicked.connect(self.remove)
 
                 self.layout.addWidget(self.title)
                 self.layout.addWidget(self.author)
                 self.layout.addWidget(self.isbn)
                 self.layout.addWidget(self.price)
                 self.layout.addWidget(self.stock)
+                self.layout.addWidget(self.delete)
 
                 self.setLayout(self.layout)
+            def remove(self,b):
+                books.pop(self.isbn.text())
+                self.deleteLater()
+
+
 
         class BookList(QWidget):
             def __init__(self):
@@ -252,8 +268,9 @@ class Window(QWidget):
                 self.group = QGroupBox()
                 self.grouplayout = QVBoxLayout()
 
-                for isbn in books:
+                for isbn in books_to_show:
                     self.grouplayout.addWidget(BookEntry(books[isbn]))
+
                 self.group.setLayout(self.grouplayout)
                 self.scroll = QScrollArea()
                 self.scroll.setWidget(self.group)
