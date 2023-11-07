@@ -1,8 +1,8 @@
 # Gramatnecbas inventara parvaldibas sistema
 # kas izmanto pyqt bibliotieku kā vizualo saskarsni
-
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout, QLineEdit, QRadioButton, QLabel, QFrame, \
-    QSizePolicy, QPushButton, QDialog, QDialogButtonBox, QGroupBox, QScrollArea
+    QSizePolicy, QPushButton, QDialog, QDialogButtonBox, QGroupBox, QScrollArea, QGridLayout
 import isbnlib
 
 app = QApplication([])
@@ -30,7 +30,8 @@ books = {
                       "stock": 9}
 
 }
-books_to_show = books
+
+books_to_show = dict(books)
 
 
 # Functions for work with books dictionary
@@ -38,6 +39,7 @@ books_to_show = books
 def add_book(title, author, isbn, price, stock):
     if isbn not in books:
         books[isbn] = {"title": title, "author": author, "isbn": isbn, "price": price, "stock": stock}
+
     else:
         show_error("Grāmata jau eksistē!")
 
@@ -46,22 +48,34 @@ def remove_book(isbn):
     if isbn in books:
         del books[isbn]
         show_success("Grāmata ir izdzesta!")
+        if isbn in books_to_show:
+            del books_to_show[isbn]
     else:
         show_error("ISBN nebija atrasts!")
 
 
 def find_book_isbn(isb):
+    global books_to_show
     books_to_show.clear()
+
+    if len(isb) == 0:
+        books_to_show = books.copy()
+
     for isbn in books:
-        if isbn.find(isb):
+        if isbn.find(isb.replace("-", "")) != -1:
             books_to_show[isbn] = books[isbn]
 
 
-def find_book_name(name):
+def find_book_name(name: str):
+    global books_to_show
     books_to_show.clear()
+
+    if len(name) == 0:
+        books_to_show = books.copy()
+
     for isbn in books:
         book = books[isbn]
-        if book["title"].find(name) or book["author"].find(name):
+        if book["title"].lower().find(name.lower()) != -1 or book["author"].lower().find(name.lower()) != -1:
             books_to_show[isbn] = book
 
 
@@ -121,11 +135,13 @@ class Window(QWidget):
         # add new entry
         # list of books
         class SearchBar(QWidget):
+
             def __init__(self):
                 super().__init__()
                 self.layout = QHBoxLayout()
-
+                self.search_text = ""
                 self.textbox = QLineEdit(self)
+                self.textbox.textChanged.connect(self.update_list)
                 self.layout.addWidget(self.textbox)
 
                 class SearchSwitch(QWidget):
@@ -146,6 +162,18 @@ class Window(QWidget):
                 self.layout.addWidget(self.searchSwitch)
 
                 self.setLayout(self.layout)
+
+            def update_list(self, text=None):
+                if text is None:
+                    text = self.search_text
+                self.search_text = text
+
+                if self.searchSwitch.isbnSearch.isChecked():
+                    find_book_isbn(text)
+                    redraw()
+                elif self.searchSwitch.nameSearch.isChecked():
+                    find_book_name(text)
+                    redraw()
 
         class AddBook(QWidget):
             def __init__(self):
@@ -215,49 +243,30 @@ class Window(QWidget):
                          isbnlib.canonical(self.isbn.field.text()),
                          float(self.price.field.text()),
                          int(self.qty.field.text()))
-                self.update()
+                update()
 
         self.searchbar = SearchBar()
         self.addBook = AddBook()
 
-        self.separator = QFrame()
-        self.separator.setFrameShape(QFrame.Shape.HLine)
-        self.separator.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-        self.separator.setLineWidth(3)
-
-        class BookEntry(QWidget):
+        class BookEntry:
             def __init__(self, book):
-                super().__init__()
-                self.layout = QHBoxLayout()
+                self.book = book
 
-                self.title = QLabel(book["title"])
-                self.author = QLabel(book["author"])
-                self.isbn = QLabel(book["isbn"])
-                self.price = QLabel(str(book["price"]))
-                self.stock = QLabel(str(book["stock"]))
-                self.delete = QPushButton("Nodzēst")
-                self.delete.clicked.connect(self.remove)
+            def remove(self, l):
+                remove_book(self.book["isbn"])
+                l()
 
-                self.layout.addWidget(self.title)
-                self.layout.addWidget(self.author)
-                self.layout.addWidget(self.isbn)
-                self.layout.addWidget(self.price)
-                self.layout.addWidget(self.stock)
-                self.layout.addWidget(self.delete)
-
-                self.setLayout(self.layout)
-            def remove(self,b):
-                books.pop(self.isbn.text())
-                self.deleteLater()
-
-
+            def button(self, l):
+                button = QPushButton("izdzēst")
+                button.clicked.connect(lambda b: self.remove(l))
+                return button
 
         class BookList(QWidget):
             def __init__(self):
                 super().__init__()
+
                 self.scroll = None
-                self.group = None
-                self.grouplayout = None
+                self.grid = None
                 self.layout = QVBoxLayout()
                 self.update_list()
 
@@ -265,15 +274,32 @@ class Window(QWidget):
                 for i in reversed(range(self.layout.count())):
                     self.layout.itemAt(i).widget().setParent(None)
 
-                self.group = QGroupBox()
-                self.grouplayout = QVBoxLayout()
+                self.grid = QGridLayout()
 
+                self.grid.addWidget(QLabel("title"), 0, 0)
+                self.grid.addWidget(QLabel("author"), 0, 1)
+                self.grid.addWidget(QLabel("isbn"), 0, 2)
+                self.grid.addWidget(QLabel("price"), 0, 3)
+                self.grid.addWidget(QLabel("stock"), 0, 4)
+                self.grid.addWidget(QLabel("izdzēst"), 0, 5)
+                i = 1
                 for isbn in books_to_show:
-                    self.grouplayout.addWidget(BookEntry(books[isbn]))
+                    book = BookEntry(books_to_show[isbn])
 
-                self.group.setLayout(self.grouplayout)
+                    self.grid.addWidget(QLabel(books[isbn]["title"]), i, 0)
+                    self.grid.addWidget(QLabel(books[isbn]["author"]), i, 1)
+                    self.grid.addWidget(QLabel(books[isbn]["isbn"]), i, 2)
+                    self.grid.addWidget(QLabel(str(books[isbn]["price"])), i, 3)
+                    self.grid.addWidget(QLabel(str(books[isbn]["stock"])), i, 4)
+                    button = book.button(lambda: self.update_list())
+
+                    self.grid.addWidget(button, i, 5)
+                    i += 1
+
                 self.scroll = QScrollArea()
-                self.scroll.setWidget(self.group)
+                wrapper_widget = QWidget()
+                wrapper_widget.setLayout(self.grid)
+                self.scroll.setWidget(wrapper_widget)
                 self.scroll.setWidgetResizable(True)
                 self.layout.addWidget(self.scroll)
                 self.setLayout(self.layout)
@@ -281,7 +307,6 @@ class Window(QWidget):
         self.books = BookList()
 
         self.layout.addWidget(self.searchbar)
-        self.layout.addWidget(self.separator)
         self.layout.addWidget(self.addBook)
         self.layout.addWidget(self.books)
         self.addBook.add.clicked.connect(lambda b: self.books.update_list())
@@ -290,5 +315,16 @@ class Window(QWidget):
 
 
 window = Window()
+
+
+def update():
+    window.searchbar.update_list()
+    redraw()
+
+
+def redraw():
+    window.books.update_list()
+
+
 window.show()
 app.exec()
